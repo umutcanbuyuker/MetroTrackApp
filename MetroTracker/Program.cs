@@ -1,3 +1,5 @@
+using MetroTracker.Controllers;
+using MetroTracker.Kafka.Consumer;
 using MetroTracker.Kafka.Producers;
 
 namespace MetroTracker
@@ -8,14 +10,17 @@ namespace MetroTracker
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add services to the container
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSingleton<LocationConsumer>();
             builder.Services.AddHostedService<M1Producer>();
-            builder.Services.AddLogging(i=>
+            builder.Services.AddLogging(i =>
             {
                 i.AddConsole();
                 i.AddDebug();
             });
+            //builder.Services.AddScoped<M1ConsumerA>();
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -16,32 +16,38 @@ namespace MetroTracker.Kafka.Producers
 				BootstrapServers = "localhost:29092"
 			};
 		}
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-		{
-			while (!stoppingToken.IsCancellationRequested)
-			{
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            // Konumları tanımla
+            List<Location> locations = new List<Location>
+            {
+                new Location { Istasyon = "Şirinevler", Enlem = 40.991387821790255, Boylam = 28.845719578603266 },
+                new Location { Istasyon = "Ara1", Enlem = 40.99147561134383, Boylam = 28.840728625322384 },
+                new Location { Istasyon = "Yenibosna", Enlem = 40.98943356672049, Boylam = 28.83685234017511 },
+                new Location { Istasyon = "Ara2", Enlem = 40.987921202137834, Boylam = 28.83257843357325 },
+                new Location { Istasyon = "Fuar Merkezi", Enlem = 40.986591482483, Boylam = 28.828568763176964 },
+                new Location { Istasyon = "Ara3", Enlem = 40.98464579947127, Boylam = 28.822564927603914 },
+                new Location { Istasyon = "Atatürk Havalimanı", Enlem = 40.97951286972792, Boylam = 28.821109311338773 }
+            };
 
-				await Task.Delay(5000);
+            int currentIndex = 0;
 
-				using StreamReader reader = new("C:\\Users\\can_u\\source\\repos\\MetroTrackApp\\MetroTracker\\Helpers\\m1locations.json");
-				var json = reader.ReadToEnd();
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                Location currentLocation = locations[currentIndex];
 
-				Location m1 = new Location
-				{
-					Istasyon = "Şirinevler",
-					Enlem = 40.991387821790255,
-					Boylam = 28.845719578603266
-				};
+                string message = $"{currentLocation.Istasyon}: Enlem: {currentLocation.Enlem}, Boylam: {currentLocation.Boylam}";
 
-				using (var producer = new ProducerBuilder<Null, string>(config).Build())
-				{
-					
-						string message = $"{m1.Istasyon}: Enlem: {m1.Enlem}, Boylam: {m1.Boylam}";
-						await producer.ProduceAsync("testtest", new Message<Null, string> { Value = message });
-						await Task.Delay(3000);
-				}
+                using (var producer = new ProducerBuilder<Null, string>(config).Build())
+                {
+                    await producer.ProduceAsync("testtest", new Message<Null, string> { Value = message });
+                }
 
-			}
-		}
-	}
+                currentIndex = (currentIndex + 1) % locations.Count;
+
+                await Task.Delay(30000, stoppingToken);
+            }
+        }
+
+    }
 }
