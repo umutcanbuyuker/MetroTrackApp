@@ -1,9 +1,10 @@
 ﻿using Confluent.Kafka;
+using MetroTracker.Hubs;
 using MetroTracker.Kafka.Consumer;
 using MetroTracker.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using System.Reflection;
 
 namespace MetroTracker.Controllers
 {
@@ -11,6 +12,7 @@ namespace MetroTracker.Controllers
     {
         public ConsumerConfig config;
         private readonly LocationConsumer _LocationConsumer;
+        private IHubContext<ConsumerHub> _hubContext;
         public MapController(LocationConsumer LocationConsumer)
         {
             config = new ConsumerConfig
@@ -60,16 +62,11 @@ namespace MetroTracker.Controllers
         public async Task<IActionResult> LocationPage()
         {
             await _LocationConsumer.StartConsumingAsync();
-            _LocationConsumer.LocationReceived += OnLocationReceived;
-
+            
             // Diğer işlemleri gerçekleştir
             return View();
         }
 
-        private void OnLocationReceived(object sender, string locationMessage)
-        {
-            // Gelen veriyi işle, örneğin ViewBag'e at
-            ViewBag.LocationMessage = locationMessage;
-        }
+
     }
 }

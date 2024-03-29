@@ -1,4 +1,5 @@
 using MetroTracker.Controllers;
+using MetroTracker.Hubs;
 using MetroTracker.Kafka.Consumer;
 using MetroTracker.Kafka.Producers;
 
@@ -12,13 +13,14 @@ namespace MetroTracker
 
             // Add services to the container
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSingleton<LocationConsumer>();
+            builder.Services.AddSingleton<LocationConsumer>(); 
             builder.Services.AddHostedService<M1Producer>();
             builder.Services.AddLogging(i =>
             {
                 i.AddConsole();
                 i.AddDebug();
             });
+            builder.Services.AddSignalR();
             //builder.Services.AddScoped<M1ConsumerA>();
             
             var app = builder.Build();
@@ -37,6 +39,9 @@ namespace MetroTracker
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.MapHub<ConsumerHub>("/ConsumerHub");
+            
 
             app.MapControllerRoute(
                 name: "default",
