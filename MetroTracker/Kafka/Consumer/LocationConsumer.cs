@@ -4,6 +4,7 @@ using MetroTracker.Hubs;
 using MetroTracker.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Controller;
+using Newtonsoft.Json;
 using System.Text.Json;
 
 namespace MetroTracker.Kafka.Consumer
@@ -46,10 +47,9 @@ namespace MetroTracker.Kafka.Consumer
                             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         };
 
-                        string jsonMessage = JsonSerializer.Serialize(locationMessage, options);
+                        Location? locationNewton = JsonConvert.DeserializeObject<Location>(locationMessage);
 
-                        Location? location = JsonSerializer.Deserialize<Location>(jsonMessage);
-                        _hubContext.Clients.All.SendAsync("KafkaMessages", location);
+                        _hubContext.Clients.All.SendAsync("KafkaMessages", locationNewton);
                     }
                     catch (ConsumeException ex)
                     {

@@ -18,7 +18,6 @@ namespace MetroTracker.Hubs
 
         public async Task SendMessagesFromProducer()
         {
-
             await _locationConsumer.StartConsumingAsync();
         }
     }

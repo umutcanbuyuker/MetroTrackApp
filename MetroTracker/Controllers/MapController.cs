@@ -27,46 +27,9 @@ namespace MetroTracker.Controllers
             return View();
         }
 
-        public IActionResult ConsumerA()
+        public IActionResult Ybs()
         {
-            using var consumer = new ConsumerBuilder<Null, string>(config).Build();
-
-            consumer.Subscribe("testtest");
-
-            CancellationTokenSource token = new();
-
-            try
-            {
-                while (true)
-                {
-                    var response = consumer.Consume(token.Token);
-                    if (response.Message == null)
-                    {
-                        var location = JsonConvert.DeserializeObject<Location>
-                            (response.Message.Value);
-
-                        Location model = new Location { Istasyon = location.Istasyon, Boylam = location.Boylam, Enlem = location.Enlem };
-                        ViewData["location"] = model;
-                        return View();
-                    }
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-
-        }
-
-        public async Task<IActionResult> LocationPage()
-        {
-            await _LocationConsumer.StartConsumingAsync();
-            
-            // Diğer işlemleri gerçekleştir
             return View();
         }
-
-
     }
 }

@@ -25,9 +25,9 @@
 </head>
 <body>
 
-    <h1>Map User Location</h1>
+    <h1>Metro Location</h1>
     <div id="map"></div>
-    <div class="container">
+    @*<div class="container">
         <div class="row p-1">
             <div class="col-1">User</div>
             <div class="col-5"><input type="text" id="userInput" /></div>
@@ -51,7 +51,7 @@
                 <ul id="messagesList"></ul>
             </div>
         </div>
-    </div>
+    </div>*@
     <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
     @*<script src="~/microsoft/kafka.js"></script>*@
     <script>
@@ -63,8 +63,6 @@
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
-
-        navigator.geolocation.watchPosition(success, error);
 
         let marker, circle, zoomed;
 
@@ -97,16 +95,11 @@
             }
         }
 
-      
-
-
         /* Kafka */
-
         "use strict";
 
         var connection = new signalR.HubConnectionBuilder().withUrl("/ConsumerHub").build();
         connection.start().then(function () {
-            // Sayfa yüklendiğinde Kafka mesajlarını al
             connection.invoke("SendMessagesFromProducer").catch(function (err) {
                 return console.error(err.toString());
             });
@@ -117,21 +110,15 @@
         connection.on("KafkaMessages", function (message) {
 
             successKafka(message);
-            navigator.geolocation.watchPosition(success, error);
-            var li = document.createElement("li");
-            document.getElementById("messagesList").appendChild(li);
-            // We can assign user-supplied strings to an element's textContent because it
-            // is not interpreted as markup. If you're assigning in any other way, you 
-            // should be aware of possible script injection concerns.
-            li.textContent = ` ${message}`;
+            navigator.geolocation(success, error);
+
         });
 
         function successKafka(message)
         {
-            console.log(message);
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            const accuracy = pos.coords.accuracy * 0.05;
+            const lat = message.enlem;
+            const lng = message.boylam;
+            const accuracy =  0.05;
 
             if (marker) {
                 map.removeLayer(marker);
@@ -145,7 +132,6 @@
                 zoomed = map.fitBounds(circle.getBounds());
             }
 
-            map.setView([lat, lng]);
         }
     </script>
 
