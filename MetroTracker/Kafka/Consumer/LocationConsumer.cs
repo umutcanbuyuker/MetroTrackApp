@@ -17,7 +17,7 @@ namespace MetroTracker.Kafka.Consumer
 
         public event EventHandler<string> LocationReceived;
 
-        public LocationConsumer(IConfiguration configuration, IHubContext<ConsumerHub> hubContext)
+        public LocationConsumer(IHubContext<ConsumerHub> hubContext)
         {
             _config = new ConsumerConfig
             {
@@ -42,14 +42,11 @@ namespace MetroTracker.Kafka.Consumer
                         var consumeResult = consumer.Consume(CancellationToken.None);
                         var locationMessage = consumeResult.Message.Value;
 
-                        var options = new JsonSerializerOptions
-                        {
-                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        };
-
                         Location? locationNewton = JsonConvert.DeserializeObject<Location>(locationMessage);
 
                         _hubContext.Clients.All.SendAsync("KafkaMessages", locationNewton);
+
+                        consumer.Close();
                     }
                     catch (ConsumeException ex)
                     {

@@ -11,16 +11,13 @@ namespace MetroTracker.Controllers
     public class MapController : Controller
     {
         public ConsumerConfig config;
-        private readonly LocationConsumer _LocationConsumer;
-        private IHubContext<ConsumerHub> _hubContext;
-        public MapController(LocationConsumer LocationConsumer)
+        public MapController()
         {
             config = new ConsumerConfig
             {
                 GroupId = "testtest",
                 BootstrapServers = "localhost:29092"
             };
-            _LocationConsumer = LocationConsumer;
         }
         public IActionResult Index()
         {
